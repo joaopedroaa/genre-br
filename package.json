@@ -6,6 +6,8 @@
   "scripts": {
     "convert": "node scripts/convert-csv.js",
     "train": "node scripts/train.js",
+    "audit": "node scripts/audit.js",
+    "clean": "node scripts/clean.js",
     "test": "jest --verbose"
   },
   "keywords": [

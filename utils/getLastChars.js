@@ -1,4 +1,4 @@
-function getLastChars(name, length = 7) {
+function getLastChars(name, length = 5) {
   if (name.length >= length) {
     return name.slice(-length);
   }

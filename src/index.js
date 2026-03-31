@@ -11,7 +11,7 @@ try {
 } catch (error) {
   throw new Error(
     "Modelo pré-treinado não encontrado (src/model.json). " +
-      'Execute "npm run convert" e depois "npm run train" para gerar o modelo.',
+      'Execute "npm run train" para gerar o modelo.',
   );
 }
 
