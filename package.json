@@ -1,0 +1,28 @@
+{
+  "name": "br-gender-info",
+  "version": "1.0.0",
+  "description": "Prevê o gênero (masculino/feminino) de nomes brasileiros usando Rede Neural Artificial treinada com dados do IBGE.",
+  "main": "src/index.js",
+  "scripts": {
+    "convert": "node scripts/convert-csv.js",
+    "train": "node scripts/train.js",
+    "test": "jest --verbose"
+  },
+  "keywords": [
+    "gender",
+    "nome",
+    "brasileiro",
+    "neural-network",
+    "brain.js",
+    "ibge",
+    "machine-learning"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "brain.js": "^1.6.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
