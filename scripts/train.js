@@ -58,24 +58,27 @@ for (let i = trainingData.length - 1; i > 0; i--) {
 console.log(`Total de amostras válidas: ${trainingData.length}`);
 
 const net = new brain.NeuralNetwork({
-  hiddenLayers: [14, 7],
+  hiddenLayers: [32, 16],
   learningRate: 0.1,
 });
 
 
 const stats = net.train(trainingData, {
-  iterations: 30000,
+  iterations: 100,
   errorThresh: 0.005,
   log: true,
-  logPeriod: 1000,
+  logPeriod: 10,
 });
 
 
 console.log(`Iterações: ${stats.iterations}`);
 console.log(`Erro final: ${stats.error.toFixed(6)}`);
 
-const version_name = `labusco`;
-const modelPath = path.join(ROOT, "models", `${version_name}.json`);
+const versionName = `passarelo`;
+const errorName = `err${(stats.error * 100).toFixed(3)}`;
+const version = `${versionName}-${errorName}`;
+
+const modelPath = path.join(ROOT, "models", `${version}.json`);
 const modelJSON = net.toJSON();
 
 fs.writeFileSync(modelPath, JSON.stringify(modelJSON), "utf-8");

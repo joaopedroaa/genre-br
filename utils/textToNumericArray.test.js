@@ -1,26 +1,27 @@
 const { textToNumericArray } = require("./textToNumericArray");
 
 describe("textToNumericArray", () => {
-  test("Deve converter cada caractere em charCode / 1000", () => {
+  test("Deve converter cada caractere em one-hot encoding de tamanho 27", () => {
     const result = textToNumericArray("a");
-    expect(result).toEqual([0.097]);
+    expect(result).toHaveLength(27);
+    expect(result[0]).toBe(1);
+    expect(result[1]).toBe(0);
   });
 
   test("Deve converter espaço corretamente", () => {
     const result = textToNumericArray(" ");
-    expect(result).toEqual([0.032]);
+    expect(result[26]).toBe(1);
   });
 
-  test("Deve retornar array com o mesmo comprimento da string", () => {
-    const result = textToNumericArray("    ana");
-    expect(result).toHaveLength(7);
+  test("Deve retornar array de tamanho proporcional à string (length * 27)", () => {
+    const result = textToNumericArray("  ana");
+    expect(result).toHaveLength(5 * 27);
   });
 
-  test("Cada valor deve estar entre 0 e 1", () => {
-    const result = textToNumericArray("    ana");
+  test("Cada valor deve ser 0 ou 1", () => {
+    const result = textToNumericArray("ana");
     result.forEach((value) => {
-      expect(value).toBeGreaterThanOrEqual(0);
-      expect(value).toBeLessThan(1);
+      expect(value === 0 || value === 1).toBeTruthy();
     });
   });
 });

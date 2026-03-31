@@ -1,5 +1,5 @@
 const brain = require("brain.js");
-const path = require("path");
+const path = require("node:path");
 const { prepareInput } = require("./utils");
 
 let net;
@@ -38,5 +38,8 @@ function getGenderInfo(name) {
     certainty: certaintyPercent,
   };
 }
+
+
+
 
 module.exports = { getGenderInfo };

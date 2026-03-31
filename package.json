@@ -8,6 +8,7 @@
     "train": "node scripts/train.js",
     "audit": "node scripts/audit.js",
     "clean": "node scripts/clean.js",
+    "test:common": "node scripts/common.js",
     "test": "jest --verbose"
   },
   "keywords": [
