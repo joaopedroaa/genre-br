@@ -1,7 +1,6 @@
-
 ![alt text](image.png)
 
-# 🇧🇷 Genre BR ~89,4%
+# Genre BR ~95.56%
 
 > _Prevê o gênero (masculino/feminino) de nomes brasileiros usando uma Rede Neural Artificial treinada com dados do IBGE._
 
@@ -53,4 +52,3 @@ Saída Esperada:
 }
 */
 ```
-

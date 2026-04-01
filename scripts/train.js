@@ -2,11 +2,10 @@ const brain = require("brain.js");
 const fs = require("node:fs");
 const path = require("node:path");
 
-const {
-  sanitizeName,
-  getLastChars,
-  textToNumericArray,
-} = require("../src/utils");
+const { sanitizeName } = require("../utils/sanitizeName.js");
+const { getLastChars } = require("../utils/getLastChars.js");
+const { textToNumericArray } = require("../utils/textToNumericArray.js");
+const { GENDER } = require("../utils/enums.js");
 
 const ROOT = path.resolve(__dirname, "..");
 
@@ -18,7 +17,6 @@ const maleNames = JSON.parse(fs.readFileSync(malePath, "utf-8"));
 
 console.log(`Nomes femininos: ${femaleNames.length}`);
 console.log(`Nomes masculinos: ${maleNames.length}`);
-
 
 function createTrainingData(rawName, genderValue) {
   try {
@@ -36,16 +34,13 @@ function createTrainingData(rawName, genderValue) {
 
 const trainingData = [];
 
-const FEMININO_VALUE = 0;
-const MASCULINO_VALUE = 1;
-
 for (const name of femaleNames) {
-  const data = createTrainingData(name, FEMININO_VALUE);
+  const data = createTrainingData(name, GENDER.FEMININO);
   if (data) trainingData.push(data);
 }
 
 for (const name of maleNames) {
-  const data = createTrainingData(name, MASCULINO_VALUE);
+  const data = createTrainingData(name, GENDER.MASCULINO);
   if (data) trainingData.push(data);
 }
 
@@ -62,14 +57,12 @@ const net = new brain.NeuralNetwork({
   learningRate: 0.1,
 });
 
-
 const stats = net.train(trainingData, {
   iterations: 100,
   errorThresh: 0.005,
   log: true,
   logPeriod: 10,
 });
-
 
 console.log(`Iterações: ${stats.iterations}`);
 console.log(`Erro final: ${stats.error.toFixed(6)}`);

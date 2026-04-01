@@ -1,0 +1,15 @@
+
+data/
+scripts/
+test/
+
+*.png
+
+models/*
+
+utils/*.test.js
+src/*.test.js
+*.test.js
+
+.prettierrc*
+.eslintrc*
