@@ -1,31 +1,29 @@
 const brain = require("brain.js");
-const path = require("node:path");
-const { prepareInput } = require("./utils");
+const { prepareInput } = require("../utils/prepareInput");
+const modelData = require("./model.json");
 
 let net;
 
 try {
-  const modelData = require(path.join(__dirname, "model.json"));
   net = new brain.NeuralNetwork();
   net.fromJSON(modelData);
-} catch (error) {
-  throw new Error(
-    "Modelo pré-treinado não encontrado (src/model.json). " +
-      'Execute "npm run train" para gerar o modelo.',
-  );
+} catch {
+  throw new Error("Modelo pré-treinado não encontrado (./model.json).");
 }
 
 function getGenderInfo(name) {
-  if (!name || typeof name !== "string") {
-    throw new Error(
-      "O nome fornecido é inválido. Forneça uma string não vazia.",
-    );
+  if (!name) {
+    return {
+      name: null,
+      male: true,
+      female: false,
+      certainty: null,
+    };
   }
 
   const input = prepareInput(name);
   const output = net.run(input);
 
-  // gender: 0 = feminino, 1 = masculino
   const genderScore = output.gender;
   const isMale = genderScore > 0.5;
   const certainty = isMale ? genderScore : 1 - genderScore;
@@ -38,8 +36,5 @@ function getGenderInfo(name) {
     certainty: certaintyPercent,
   };
 }
-
-
-
 
 module.exports = { getGenderInfo };

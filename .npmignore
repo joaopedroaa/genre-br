@@ -1,15 +1,13 @@
-
-data/
-scripts/
-test/
-
-*.png
-
+data/*
+scripts/*
+test/*
 models/*
 
 utils/*.test.js
 src/*.test.js
 *.test.js
 
+*.png
 .prettierrc*
 .eslintrc*
+failures.json

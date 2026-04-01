@@ -212,10 +212,17 @@ describe("getGenderInfo", () => {
     },
   );
 
-  test("Deve lançar erro para entrada inválida", () => {
-    if (!getGenderInfo) return;
+  test('Deve lidar com entrada nula', () => {
+    const result = getGenderInfo(null);
 
-    expect(() => getGenderInfo("")).toThrow();
-    expect(() => getGenderInfo(null)).toThrow();
-  });
+    expect(result).toStrictEqual({
+      name: null,
+      male: true,
+      female: false,
+      certainty: null,
+    });
+
+  })
+
+
 });

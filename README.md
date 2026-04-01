@@ -15,7 +15,7 @@ O **Genre BR** é uma biblioteca Node.js que utiliza **Machine Learning** (atrav
 Como o projeto é um pacote Node.js, você pode instalá-lo em seu projeto:
 
 ```bash
-npm install br-gender-info
+npm install gender-br
 ```
 
 Não se esqueça de instalar as dependências locais se for rodar no próprio repositório para mexer com o modelo:
@@ -30,7 +30,7 @@ A API é simples e direta. Ela expõe a função `getGenderInfo()`, que recebe u
 
 ```javascript
 // Exemplo de uso em outro projeto:
-const { getGenderInfo } = require("br-gender-info");
+const { getGenderInfo } = require("gender-br");
 
 // Se estiver testando dentro da própria pasta do repositório, use:
 // const { getGenderInfo } = require("./src/index");

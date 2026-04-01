@@ -1,6 +1,6 @@
 {
   "name": "gender-br",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Prevê o gênero (masculino/feminino) de nomes brasileiros usando Rede Neural Artificial treinada com dados do IBGE.",
   "main": "src/index.js",
   "scripts": {

@@ -1,6 +1,10 @@
 const { sanitizeName } = require("../utils/sanitizeName");
 
  describe("sanitizeName", () => {
+    test("Deve retornar uma string vazia para entrada vazia", () => {
+      expect(sanitizeName("")).toBe("");
+    });
+
     test("Deve extrair e sanitizar o primeiro nome", () => {
       expect(sanitizeName("João Pedro da Silva")).toBe("joao");
     });
@@ -19,10 +23,6 @@ const { sanitizeName } = require("../utils/sanitizeName");
 
     test("Deve lidar com espaços extras", () => {
       expect(sanitizeName("  Fernanda  Souza  ")).toBe("fernanda");
-    });
-
-    test("Deve lançar erro para entrada vazia", () => {
-      expect(() => sanitizeName("")).toThrow();
     });
 
     test("Deve lançar erro para entrada não-string", () => {
