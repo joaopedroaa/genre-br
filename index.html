@@ -1,0 +1,1204 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Genre BR — Playground Interativo</title>
+    <meta
+      name="description"
+      content="Playground interativo para testar o modelo de Rede Neural que identifica gênero de nomes brasileiros com ~95.56% de precisão."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-primary: #0a0a0f;
+        --bg-secondary: #12121a;
+        --bg-card: #1a1a28;
+        --bg-card-hover: #222236;
+        --border: rgba(255, 255, 255, 0.06);
+        --border-focus: rgba(139, 92, 246, 0.5);
+        --text-primary: #f0f0f5;
+        --text-secondary: #8888a0;
+        --text-muted: #55556a;
+        --accent-violet: #8b5cf6;
+        --accent-violet-dim: rgba(139, 92, 246, 0.15);
+        --accent-blue: #3b82f6;
+        --accent-pink: #ec4899;
+        --accent-emerald: #10b981;
+        --male-gradient: linear-gradient(135deg, #3b82f6, #6366f1);
+        --female-gradient: linear-gradient(135deg, #ec4899, #f472b6);
+        --glass: rgba(255, 255, 255, 0.03);
+        --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        --radius-sm: 8px;
+        --radius-md: 12px;
+        --radius-lg: 16px;
+        --radius-xl: 24px;
+        --radius-full: 9999px;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          'Inter',
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        min-height: 100vh;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+
+
+      .bg-noise {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.03;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+
+      .bg-gradient-orb {
+        position: fixed;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        filter: blur(120px);
+        opacity: 0.12;
+        pointer-events: none;
+        z-index: 0;
+        animation: orbFloat 20s ease-in-out infinite;
+      }
+
+      .bg-gradient-orb.orb-1 {
+        background: var(--accent-violet);
+        top: -200px;
+        left: -200px;
+      }
+
+      .bg-gradient-orb.orb-2 {
+        background: var(--accent-blue);
+        bottom: -200px;
+        right: -200px;
+        animation-delay: -10s;
+      }
+
+      .bg-gradient-orb.orb-3 {
+        background: var(--accent-pink);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 400px;
+        height: 400px;
+        opacity: 0.06;
+        animation-delay: -5s;
+      }
+
+      @keyframes orbFloat {
+        0%,
+        100% {
+          transform: translate(0, 0) scale(1);
+        }
+        33% {
+          transform: translate(30px, -30px) scale(1.05);
+        }
+        66% {
+          transform: translate(-20px, 20px) scale(0.95);
+        }
+      }
+
+
+      .app-container {
+        position: relative;
+        z-index: 1;
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 40px 20px 80px;
+      }
+
+
+      .header {
+        text-align: center;
+        margin-bottom: 48px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        background: var(--accent-violet-dim);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: var(--radius-full);
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--accent-violet);
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+      }
+
+      .badge svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      .header h1 {
+        font-size: clamp(32px, 6vw, 48px);
+        font-weight: 800;
+        letter-spacing: -1.5px;
+        line-height: 1.1;
+        margin-bottom: 12px;
+        background: linear-gradient(135deg, #f0f0f5 0%, #8888a0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .header p {
+        font-size: 15px;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        max-width: 500px;
+        margin: 0 auto;
+      }
+
+
+      .input-section {
+        position: relative;
+        margin-bottom: 32px;
+      }
+
+      .input-wrapper {
+        position: relative;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: 6px;
+        transition:
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+
+      .input-wrapper:focus-within {
+        border-color: var(--border-focus);
+        box-shadow:
+          0 0 0 4px rgba(139, 92, 246, 0.1),
+          var(--shadow-xl);
+      }
+
+      .input-inner {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .input-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
+        color: var(--text-muted);
+        margin-left: 8px;
+      }
+
+      .input-icon svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      #name-input {
+        flex: 1;
+        background: none;
+        border: none;
+        outline: none;
+        font-family: inherit;
+        font-size: 17px;
+        font-weight: 500;
+        color: var(--text-primary);
+        padding: 14px 0;
+        caret-color: var(--accent-violet);
+      }
+
+      #name-input::placeholder {
+        color: var(--text-muted);
+        font-weight: 400;
+      }
+
+      #submit-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        border: none;
+        border-radius: var(--radius-lg);
+        background: var(--accent-violet);
+        color: white;
+        cursor: pointer;
+        transition:
+          transform 0.15s,
+          opacity 0.2s,
+          background 0.2s;
+      }
+
+      #submit-btn:hover {
+        transform: scale(1.05);
+        background: #7c3aed;
+      }
+
+      #submit-btn:active {
+        transform: scale(0.97);
+      }
+
+      #submit-btn svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .input-hint {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 12px;
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+
+      .input-hint kbd {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 6px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        font-family: inherit;
+        font-size: 11px;
+      }
+
+
+      .result-container {
+        perspective: 1000px;
+      }
+
+      .result-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: 0;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+        transition:
+          opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+          transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .result-card.visible {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+
+      .result-card.male {
+        border-color: rgba(59, 130, 246, 0.2);
+      }
+
+      .result-card.female {
+        border-color: rgba(236, 72, 153, 0.2);
+      }
+
+      .result-header {
+        position: relative;
+        padding: 32px 32px 24px;
+        overflow: hidden;
+      }
+
+      .result-header::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        opacity: 0.06;
+        transition: opacity 0.4s;
+      }
+
+      .result-card.male .result-header::before {
+        background: var(--male-gradient);
+      }
+
+      .result-card.female .result-header::before {
+        background: var(--female-gradient);
+      }
+
+      .result-name-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 8px;
+      }
+
+      .result-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        flex-shrink: 0;
+      }
+
+      .result-card.male .result-avatar {
+        background: rgba(59, 130, 246, 0.12);
+      }
+
+      .result-card.female .result-avatar {
+        background: rgba(236, 72, 153, 0.12);
+      }
+
+      .result-name-info {
+        flex: 1;
+      }
+
+      .result-name {
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        line-height: 1.2;
+      }
+
+      .result-label {
+        font-size: 14px;
+        font-weight: 500;
+        margin-top: 2px;
+      }
+
+      .result-card.male .result-label {
+        color: var(--accent-blue);
+      }
+
+      .result-card.female .result-label {
+        color: var(--accent-pink);
+      }
+
+
+      .confidence-section {
+        padding: 0 32px 32px;
+      }
+
+      .confidence-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+
+      .confidence-title {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
+
+      .confidence-value {
+        font-size: 20px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .result-card.male .confidence-value {
+        color: var(--accent-blue);
+      }
+
+      .result-card.female .confidence-value {
+        color: var(--accent-pink);
+      }
+
+      .confidence-bar-track {
+        width: 100%;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: var(--radius-full);
+        overflow: hidden;
+      }
+
+      .confidence-bar-fill {
+        height: 100%;
+        border-radius: var(--radius-full);
+        width: 0%;
+        transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .result-card.male .confidence-bar-fill {
+        background: var(--male-gradient);
+      }
+
+      .result-card.female .confidence-bar-fill {
+        background: var(--female-gradient);
+      }
+
+
+      .details-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border-top: 1px solid var(--border);
+      }
+
+      .detail-item {
+        padding: 20px 32px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .detail-item:first-child {
+        border-right: 1px solid var(--border);
+      }
+
+      .detail-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
+
+      .detail-value {
+        font-size: 15px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .detail-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+
+      .detail-dot.male {
+        background: var(--accent-blue);
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+      }
+
+      .detail-dot.female {
+        background: var(--accent-pink);
+        box-shadow: 0 0 8px rgba(236, 72, 153, 0.4);
+      }
+
+
+      .history-section {
+        margin-top: 40px;
+      }
+
+      .history-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .history-title svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .history-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .history-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 18px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          border-color 0.2s,
+          transform 0.15s;
+        animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+
+      .history-item:hover {
+        background: var(--bg-card-hover);
+        border-color: rgba(255, 255, 255, 0.1);
+        transform: translateX(4px);
+      }
+
+      .history-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      .history-dot.male {
+        background: var(--accent-blue);
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+      }
+
+      .history-dot.female {
+        background: var(--accent-pink);
+        box-shadow: 0 0 8px rgba(236, 72, 153, 0.3);
+      }
+
+      .history-name {
+        flex: 1;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .history-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .history-gender {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-secondary);
+      }
+
+      .history-certainty {
+        font-size: 12px;
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: var(--radius-full);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .history-certainty.male {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent-blue);
+      }
+
+      .history-certainty.female {
+        background: rgba(236, 72, 153, 0.1);
+        color: var(--accent-pink);
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+
+      .loading-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 20px;
+        background: var(--bg-primary);
+        transition:
+          opacity 0.5s,
+          visibility 0.5s;
+      }
+
+      .loading-overlay.hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid var(--border);
+        border-top-color: var(--accent-violet);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      .loading-text {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-secondary);
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-muted);
+      }
+
+      .empty-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 16px;
+        border-radius: var(--radius-lg);
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+      }
+
+      .empty-state p {
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+
+      .quick-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+        margin-top: 24px;
+      }
+
+      .chip {
+        padding: 8px 16px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-full);
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .chip:hover {
+        background: var(--bg-card-hover);
+        border-color: rgba(255, 255, 255, 0.1);
+        color: var(--text-primary);
+        transform: translateY(-1px);
+      }
+
+
+      .footer {
+        text-align: center;
+        margin-top: 64px;
+        padding: 24px 0;
+        border-top: 1px solid var(--border);
+      }
+
+      .footer p {
+        font-size: 12px;
+        color: var(--text-muted);
+        line-height: 1.6;
+      }
+
+      .footer a {
+        color: var(--accent-violet);
+        text-decoration: none;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+
+
+      @media (max-width: 480px) {
+        .app-container {
+          padding: 24px 16px 60px;
+        }
+
+        .result-header {
+          padding: 24px 20px 20px;
+        }
+
+        .confidence-section {
+          padding: 0 20px 24px;
+        }
+
+        .detail-item {
+          padding: 16px 20px;
+        }
+
+        .result-name {
+          font-size: 22px;
+        }
+
+        .result-avatar {
+          width: 44px;
+          height: 44px;
+          font-size: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-noise"></div>
+    <div class="bg-gradient-orb orb-1"></div>
+    <div class="bg-gradient-orb orb-2"></div>
+    <div class="bg-gradient-orb orb-3"></div>
+
+    <div class="loading-overlay" id="loading-overlay">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Carregando modelo neural…</div>
+    </div>
+
+    <main class="app-container">
+      <header class="header">
+        <div class="badge">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93" />
+            <path d="M8.56 9.6A4 4 0 1 1 16 6" />
+            <path d="M12 18v-6" />
+            <circle cx="12" cy="20" r="2" />
+          </svg>
+          Rede Neural · ~95.56% de precisão
+        </div>
+        <h1>Genre BR</h1>
+        <p>
+          Digite um nome brasileiro e descubra se a rede neural o classifica
+          como masculino ou feminino.
+        </p>
+      </header>
+
+      <section class="input-section">
+        <div class="input-wrapper">
+          <div class="input-inner">
+            <div class="input-icon">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              id="name-input"
+              placeholder="Digite um nome… ex: Maria, João, Dandara"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button id="submit-btn" aria-label="Analisar nome">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="input-hint">Pressione <kbd>Enter ↵</kbd> para analisar</div>
+      </section>
+
+      <div class="result-container" id="result-container">
+        <div class="empty-state" id="empty-state">
+          <div class="empty-icon">🧠</div>
+          <p>
+            O modelo de IA está pronto para analisar.<br />Digite um nome para
+            começar.
+          </p>
+          <div class="quick-chips">
+            <button class="chip" data-name="Maria">Maria</button>
+            <button class="chip" data-name="João">João</button>
+            <button class="chip" data-name="Dandara">Dandara</button>
+            <button class="chip" data-name="Pedro">Pedro</button>
+            <button class="chip" data-name="Valentina">Valentina</button>
+            <button class="chip" data-name="Ariel">Ariel</button>
+            <button class="chip" data-name="Luan">Luan</button>
+            <button class="chip" data-name="Isis">Isis</button>
+          </div>
+        </div>
+
+        <div class="result-card" id="result-card">
+          <div class="result-header">
+            <div class="result-name-row">
+              <div class="result-avatar" id="result-avatar"></div>
+              <div class="result-name-info">
+                <div class="result-name" id="result-name"></div>
+                <div class="result-label" id="result-label"></div>
+              </div>
+            </div>
+          </div>
+          <div class="confidence-section">
+            <div class="confidence-header">
+              <span class="confidence-title">Confiança</span>
+              <span class="confidence-value" id="confidence-value"></span>
+            </div>
+            <div class="confidence-bar-track">
+              <div class="confidence-bar-fill" id="confidence-bar"></div>
+            </div>
+          </div>
+          <div class="details-section">
+            <div class="detail-item">
+              <span class="detail-label">Classificação</span>
+              <span class="detail-value" id="detail-gender"></span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Score Bruto</span>
+              <span class="detail-value" id="detail-score"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section
+        class="history-section"
+        id="history-section"
+        style="display: none"
+      >
+        <div class="history-title">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          Histórico de consultas
+        </div>
+        <div class="history-list" id="history-list"></div>
+      </section>
+
+      <footer class="footer">
+        <p>
+          Modelo treinado com dados do IBGE via
+          <a
+            href="https://github.com/BrainJS/brain.js"
+            target="_blank"
+            rel="noopener"
+            >brain.js</a
+          ><br />
+          Arquitetura: 135 → 32 → 16 → 1 (sigmoid)
+        </p>
+      </footer>
+    </main>
+
+    <script>
+      // ═══════════════════════════════════════════════
+      //  Neural Network Forward Pass (Pure JS)
+      // ═══════════════════════════════════════════════
+
+      let modelData = null
+
+      // Sigmoid activation
+      function sigmoid(x) {
+        return 1 / (1 + Math.exp(-x))
+      }
+
+      // Forward pass through the network
+      function runNetwork(input) {
+        const layers = modelData.layers
+        let currentInput = input
+
+        // Process hidden layers (skip input layer at index 0)
+        for (let l = 1; l < layers.length; l++) {
+          const layer = layers[l]
+          const keys = Object.keys(layer)
+          const output = []
+
+          for (const key of keys) {
+            const neuron = layer[key]
+            let sum = neuron.bias
+            const weights = neuron.weights
+
+            for (let w = 0; w < currentInput.length; w++) {
+              sum += (weights[w] || 0) * currentInput[w]
+            }
+
+            output.push(sigmoid(sum))
+          }
+
+          currentInput = output
+        }
+
+        // Last layer has 'gender' key
+        return { gender: currentInput[0] }
+      }
+
+      // ═══════════════════════════════════════════════
+      //  Preprocessing (mirrored from Node.js utils)
+      // ═══════════════════════════════════════════════
+
+      function removeAccents(text) {
+        return text.normalize('NFD').replaceAll(/[\u0300-\u036f]/g, '')
+      }
+
+      function sanitizeName(fullName) {
+        const firstName = fullName.trim().split(/\s+/)[0]
+        const normalized = removeAccents(firstName).toLowerCase()
+        return normalized.replaceAll(/[^a-z]/g, '')
+      }
+
+      function getLastChars(name, length = 5) {
+        if (name.length >= length) {
+          return name.slice(-length)
+        }
+        return name.padStart(length, ' ')
+      }
+
+      const ALPHABET = 'abcdefghijklmnopqrstuvwxyz '.split('')
+      const CHAR_TO_INDEX = {}
+      ALPHABET.forEach((char, index) => {
+        CHAR_TO_INDEX[char] = index
+      })
+
+      function textToNumericArray(text) {
+        const result = []
+        for (let i = 0; i < text.length; i++) {
+          const char = text[i].toLowerCase()
+          const oneHot = new Array(27).fill(0)
+          const index = CHAR_TO_INDEX[char]
+          if (index !== undefined) {
+            oneHot[index] = 1
+          } else {
+            oneHot[26] = 1
+          }
+          result.push(...oneHot)
+        }
+        return result
+      }
+
+      function prepareInput(rawName) {
+        const sanitized = sanitizeName(rawName)
+        const suffix = getLastChars(sanitized, 5)
+        return textToNumericArray(suffix)
+      }
+
+      // ═══════════════════════════════════════════════
+      //  Gender Info (mirrors src/index.js)
+      // ═══════════════════════════════════════════════
+
+      function getGenderInfo(name) {
+        if (!name || !name.trim()) {
+          return null
+        }
+
+        const input = prepareInput(name)
+        const output = runNetwork(input)
+
+        const genderScore = output.gender
+        const isMale = genderScore > 0.5
+        const certainty = isMale ? genderScore : 1 - genderScore
+        const certaintyPercent = (certainty * 100).toFixed(1) + '%'
+
+        return {
+          name: name.trim(),
+          male: isMale,
+          female: !isMale,
+          certainty: certaintyPercent,
+          certaintyRaw: certainty,
+          score: genderScore
+        }
+      }
+
+      // ═══════════════════════════════════════════════
+      //  UI Logic
+      // ═══════════════════════════════════════════════
+
+      const history = []
+
+      function displayResult(result) {
+        const card = document.getElementById('result-card')
+        const emptyState = document.getElementById('empty-state')
+
+        emptyState.style.display = 'none'
+        card.classList.remove('visible', 'male', 'female')
+
+        // Force reflow for re-animation
+        void card.offsetWidth
+
+        const genderClass = result.male ? 'male' : 'female'
+        card.classList.add(genderClass)
+
+        document.getElementById('result-avatar').textContent = result.male
+          ? '♂'
+          : '♀'
+        document.getElementById('result-name').textContent = result.name
+        document.getElementById('result-label').textContent = result.male
+          ? 'Masculino'
+          : 'Feminino'
+        document.getElementById('confidence-value').textContent =
+          result.certainty
+        document.getElementById('detail-score').textContent =
+          result.score.toFixed(6)
+
+        const dotClass = result.male ? 'male' : 'female'
+        document.getElementById('detail-gender').innerHTML =
+          `<span class="detail-dot ${dotClass}"></span> ${result.male ? 'Masculino' : 'Feminino'}`
+
+        // Animate bar
+        const bar = document.getElementById('confidence-bar')
+        bar.style.width = '0%'
+
+        requestAnimationFrame(() => {
+          card.classList.add('visible')
+          requestAnimationFrame(() => {
+            bar.style.width = (result.certaintyRaw * 100).toFixed(1) + '%'
+          })
+        })
+
+        // Add to history
+        addToHistory(result)
+      }
+
+      function addToHistory(result) {
+        // Avoid duplicate consecutive
+        if (
+          history.length > 0 &&
+          history[0].name.toLowerCase() === result.name.toLowerCase()
+        )
+          return
+
+        history.unshift(result)
+        if (history.length > 10) history.pop()
+        renderHistory()
+      }
+
+      function renderHistory() {
+        const section = document.getElementById('history-section')
+        const list = document.getElementById('history-list')
+
+        if (history.length === 0) {
+          section.style.display = 'none'
+          return
+        }
+
+        section.style.display = 'block'
+        list.innerHTML = ''
+
+        history.forEach((item, index) => {
+          const div = document.createElement('div')
+          div.className = 'history-item'
+          div.style.animationDelay = index * 0.03 + 's'
+          div.addEventListener('click', () => {
+            document.getElementById('name-input').value = item.name
+            analyzeInput()
+          })
+
+          const genderClass = item.male ? 'male' : 'female'
+          div.innerHTML = `
+          <span class="history-dot ${genderClass}"></span>
+          <span class="history-name">${item.name}</span>
+          <div class="history-meta">
+            <span class="history-gender">${item.male ? 'Masculino' : 'Feminino'}</span>
+            <span class="history-certainty ${genderClass}">${item.certainty}</span>
+          </div>
+        `
+
+          list.appendChild(div)
+        })
+      }
+
+      function analyzeInput() {
+        const input = document.getElementById('name-input')
+        const name = input.value.trim()
+        if (!name) return
+
+        const result = getGenderInfo(name)
+        if (result) {
+          displayResult(result)
+        }
+      }
+
+      // ═══════════════════════════════════════════════
+      //  Event Listeners
+      // ═══════════════════════════════════════════════
+
+      document.addEventListener('DOMContentLoaded', () => {
+        // Load model
+        fetch('src/model.json')
+          .then((res) => res.json())
+          .then((data) => {
+            modelData = data
+            document.getElementById('loading-overlay').classList.add('hidden')
+            document.getElementById('name-input').focus()
+          })
+          .catch((err) => {
+            console.error('Erro ao carregar o modelo:', err)
+            document.querySelector('.loading-text').textContent =
+              'Erro ao carregar modelo. Verifique o console.'
+          })
+
+        // Enter key
+        document
+          .getElementById('name-input')
+          .addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              analyzeInput()
+            }
+          })
+
+        // Button click
+        document
+          .getElementById('submit-btn')
+          .addEventListener('click', analyzeInput)
+
+        // Quick chips
+        document.querySelectorAll('.chip[data-name]').forEach((chip) => {
+          chip.addEventListener('click', () => {
+            document.getElementById('name-input').value = chip.dataset.name
+            analyzeInput()
+          })
+        })
+      })
+    </script>
+  </body>
+</html>
